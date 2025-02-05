@@ -102,9 +102,9 @@ def validate (db, source, destination, asset, quantity, tag):
     if ('asset invalid' not in problems) and (util.get_balance(db, source, asset) < quantity):
         problems.append('balance insufficient')
 
-    try: 
-        tag.decode("utf-8")
-    except UnicodeDecodeError:
+    try:
+        json.dumps(tag)
+    except (TypeError, OverflowError):
         problems.append("cannot decode tag")
 
     if len(problems) > 0:
