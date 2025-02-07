@@ -102,9 +102,9 @@ def validate (db, source, destination, asset, quantity, tag):
     if ('asset invalid' not in problems) and (util.get_balance(db, source, asset) < quantity):
         problems.append('balance insufficient')
 
-    try: 
-        tag.decode("utf-8")
-    except UnicodeDecodeError:
+    try:
+        json.dumps(tag)
+    except (TypeError, OverflowError):
         problems.append("cannot decode tag")
 
     if len(problems) > 0:
@@ -154,10 +154,13 @@ def parse (db, tx, message):
         if tx["block_index"] != config.MEMPOOL_BLOCK_INDEX:
             logger.warn("Not storing [destroy] tx [%s]: %s" % (tx['tx_hash'], status))
             
-            if "cannot decode tag" in status:
-                bindings["tag"] = ""
-            
-            logger.debug("Bindings: %s" % (json.dumps(bindings), ))
+            bindings_dump = ""
+            try:
+                bindings_dump = json.dumps(bindings)
+            except TypeError:
+                bindings_dump = "ERROR: bindings not serializable"
+                
+            logger.debug("Bindings: %s" % (bindings_dump, ))
 
 
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
