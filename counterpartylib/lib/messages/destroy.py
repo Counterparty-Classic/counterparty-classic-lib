@@ -103,7 +103,8 @@ def validate (db, source, destination, asset, quantity, tag):
         problems.append('balance insufficient')
 
     try:
-        json.dumps(tag)
+        if type(tag) is not bytes:
+            json.dumps(tag)
     except (TypeError, OverflowError):
         problems.append("cannot decode tag")
 
