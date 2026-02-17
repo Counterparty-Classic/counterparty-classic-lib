@@ -17,8 +17,8 @@ if ([ -z "$2" ] || [ $2 != "true" ]); then
         PARAMS="${PARAMS} --checkdb"
     fi
     if [ ! -f /root/.local/share/counterparty/counterparty.testnet.db ] && [ $1 = "testnet" ]; then
-        echo "Downloading testnet bootstrap DB..."
-        counterparty-server --testnet bootstrap --quiet
+#        echo "Downloading testnet bootstrap DB..."
+#        counterparty-server --testnet bootstrap --quiet
         PARAMS="${PARAMS} --checkdb"
     fi
 fi
