@@ -502,7 +502,11 @@ def get_tx_info(tx_hex, block_parser=None, block_index=None, db=None):
 
 def _get_swap_tx(decoded_tx, block_parser=None, block_index=None, db=None):
     def get_pubkeyhash(scriptpubkey):
-        asm = script.get_asm(scriptpubkey)
+        try:
+            asm = script.get_asm(scriptpubkey)
+        except DecodeError:
+            # Treat an undecodable output script as paying no address (one halted parsing at block 972301).
+            return False
         
         if len(asm) > 0:
             if asm[0] == "OP_DUP":
@@ -551,7 +555,10 @@ def _get_swap_tx(decoded_tx, block_parser=None, block_index=None, db=None):
             destination = address
             btc_amount = vout.nValue
         elif util.enabled('hotfix_dispensers_with_non_p2pkh'):
-            asm = script.get_asm(vout.scriptPubKey)
+            try:
+                asm = script.get_asm(vout.scriptPubKey)
+            except DecodeError:
+                continue # Skip an undecodable output script, like an unrecognised one.
             if asm[-1] == 'OP_CHECKSIG':
                 try:
                     destination, new_data = decode_checksig(asm, decoded_tx)
